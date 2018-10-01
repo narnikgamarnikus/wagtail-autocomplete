@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.http import (HttpResponseBadRequest, HttpResponseForbidden,
@@ -70,7 +71,12 @@ def search(request):
     except Exception:
         pass
 
-    results = map(render_page, queryset[:20])
+    if hasattr(settings, 'AUTOCOMPLETE_DEFAULT_QUERYSET_COUNT'):
+        count = settings.AUTOCOMPLETE_DEFAULT_QUERYSET_COUNT
+    else:
+        count = 20
+
+    results = map(render_page, queryset[:count])
     return JsonResponse(dict(items=list(results)))
 
 
